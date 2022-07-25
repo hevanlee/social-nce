@@ -5,6 +5,8 @@ import os
 import torch
 import numpy as np
 import gym
+import sys
+sys.path.append('../')
 from crowd_nav.utils.explorer import Explorer
 from crowd_nav.utils.frames import FrameStack, latest_frame
 from crowd_nav.policy.policy_factory import policy_factory

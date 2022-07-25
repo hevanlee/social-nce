@@ -5,6 +5,8 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import sys
+sys.path.append('../')
 
 from crowd_nav.utils.pretrain import freeze_model, trim_model_dict
 from crowd_nav.utils.dataset import ImitDataset, split_dataset
