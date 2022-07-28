@@ -68,6 +68,9 @@ class ExtendedNetwork(nn.Module):
             robot_state = robot_state.unsqueeze(0)
             crowd_obsv = crowd_obsv.unsqueeze(0)
 
+        robot_state.to(device='cuda')
+        crowd_obsv.to(device='cuda')
+        
         # preprocessing
         emb_robot = self.robot_encoder(robot_state[:, :4])
 
