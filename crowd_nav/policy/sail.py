@@ -70,11 +70,11 @@ class ExtendedNetwork(nn.Module):
 
         robot_state.to(device='cuda')
         crowd_obsv.to(device='cuda')
-        
+
         # preprocessing
         emb_robot = self.robot_encoder(robot_state[:, :4])
 
-        human_state = self.transform.transform_frame(crowd_obsv)
+        human_state = self.transform.transform_frame(crowd_obsv.to(device='cuda'))
         feat_human = self.human_encoder(human_state)
         emb_human = self.human_head(feat_human)
 
@@ -124,7 +124,7 @@ class SAIL(MultiHumanPolicy):
 
         self.last_state = self.transform(state)
 
-        action = self.model(self.last_state[0], self.last_state[1])[0].squeeze()
+        action = self.model(self.last_state[0].to(device='cuda'), self.last_state[1])[0].squeeze().to(device='cuda')
 
         return ActionXY(action[0].item(), action[1].item()) if self.kinematics == 'holonomic' else ActionRot(action[0].item(), action[1].item())
 
@@ -132,7 +132,7 @@ class SAIL(MultiHumanPolicy):
         """ Transform state object to tensor input
         """
 
-        robot_state = torch.Tensor([state.self_state.px, state.self_state.py, state.self_state.vx, state.self_state.vy, state.self_state.gx, state.self_state.gy])
+        robot_state = torch.Tensor([state.self_state.px, state.self_state.py, state.self_state.vx, state.self_state.vy, state.self_state.gx, state.self_state.gy]).to(device='cuda')
 
         num_human = len(state.human_states)
         human_state = torch.empty([num_human, 4])
@@ -141,5 +141,5 @@ class SAIL(MultiHumanPolicy):
             human_state[k, 1] = state.human_states[k].py
             human_state[k, 2] = state.human_states[k].vx
             human_state[k, 3] = state.human_states[k].vy
-
+        human_state.to(device='cuda')
         return [robot_state, human_state]

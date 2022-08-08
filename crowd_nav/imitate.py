@@ -67,7 +67,6 @@ def set_loader(args, device):
     """
     Set Data Loader
     """
-    if args.gpu == True and cuda.is_available() then device = 'cuda' else device = 'cpu'
     # demo_file = os.path.join(args.memory_dir, 'data_imit.pt')
     all_scenes = prepare_data('data/five_parallel_synth/orca_five_nontraj_synth.ndjson')
     # data_imit = torch.load(demo_file)
@@ -226,7 +225,7 @@ def main():
                          train_loss_all, eval_loss_all, train_loss_task, eval_loss_task, train_loss_nce, eval_loss_nce)
             torch.save(policy_net.state_dict(), os.path.join(args.output_dir, 'policy_net_{:02d}.pth'.format(epoch)))
 
-    torch.save(policy_net.state_dict(), os.path.join(args.output_dir, 'policy_net.pth'))
+    torch.save(policy_net.state_dict(), os.path.join(args.output_dir, args.model_file, 'policy_net.pth'))
 
 
 if __name__ == '__main__':
