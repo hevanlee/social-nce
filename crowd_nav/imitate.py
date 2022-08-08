@@ -9,11 +9,13 @@ import sys
 sys.path.append('../')
 
 from crowd_nav.utils.pretrain import freeze_model, trim_model_dict
-from crowd_nav.utils.dataset import ImitDataset, split_dataset
+from crowd_nav.utils.dataset import ImitDataset, TrajDataset, split_dataset
 from crowd_nav.policy.policy_factory import policy_factory
 from crowd_nav.utils.configure import config_log, config_path
 from crowd_nav.snce.contrastive import SocialNCE
 from crowd_nav.snce.model import ProjHead, SpatialEncoder, EventEncoder
+
+from .data_load_utils import prepare_data
 
 torch.manual_seed(2020)
 
@@ -36,8 +38,10 @@ def parse_arguments():
     parser.add_argument('--scheduler_patience', type=int, default=20)
     parser.add_argument('--save_every', type=int, default=5)
     parser.add_argument('--model_file', type=str, default="")
-    parser.add_argument('--output_dir', type=str, default='data/output/imitate')
-    parser.add_argument('--memory_dir', type=str, default='data/demonstration')
+    # parser.add_argument('--output_dir', type=str, default='data/output/imitate')
+    # parser.add_argument('--memory_dir', type=str, default='data/demonstration')
+    parser.add_argument('--output_dir', type=str, default='data/output/five_parallel_synth')
+    parser.add_argument('--memory_dir', type=str, default='data/five_parallel_synth')
     parser.add_argument('--freeze', default=False, action='store_true')
     parser.add_argument('--gpu', default=False, action='store_true')
     args = parser.parse_args()
@@ -63,14 +67,17 @@ def set_loader(args, device):
     """
     Set Data Loader
     """
-    demo_file = os.path.join(args.memory_dir, 'data_imit.pt')
-    logging.info('Load data from %s', demo_file)
-    data_imit = torch.load(demo_file)
-
-    dataset_imit = ImitDataset(data_imit, None, device, horizon=args.contrast_horizon)
-
+    if args.gpu == True and cuda.is_available() then device = 'cuda' else device = 'cpu'
+    # demo_file = os.path.join(args.memory_dir, 'data_imit.pt')
+    all_scenes = prepare_data('data/five_parallel_synth/orca_five_nontraj_synth.ndjson')
+    # data_imit = torch.load(demo_file)
+    data_traj - torch.tensor(all_scenes, device=device)
+    x, y = data_traj.shape
+    # dataset_imit = ImitDataset(data_imit, None, device, horizon=args.contrast_horizon)
+    dataset_traj = TrajDataset(data_traj, x, 0, device)
     validation_split = 0.3
-    train_loader, valid_loader = split_dataset(dataset_imit, args.batch_size, args.percent_label, validation_split)
+    # train_loader, valid_loader = split_dataset(dataset_imit, args.batch_size, args.percent_label, validation_split)
+    train_loader, valid_loader = split_dataset(dataset_traj, args.batch_size, args.percent_label, validation_split)
     return train_loader, valid_loader
 
 
